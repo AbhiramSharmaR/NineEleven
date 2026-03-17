@@ -585,9 +585,9 @@ em {
 
 .insight-card-front {
     background-color: #111;
-    background-image: url('https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80');
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
     display: flex;
     align-items: flex-end;
     border: 1px solid rgba(255,255,255,0.1);
@@ -681,11 +681,11 @@ em {
     font-size: 0.8rem;
 }
 
-/* 3. 3D Rotating Gallery (Carousel) */
-.gallery-section {
+/* 3. Interactive World Map */
+.map-section {
     padding: 100px 0 150px;
-    overflow: hidden;
     position: relative;
+    background: #000;
 }
 
 .text-center {
@@ -693,49 +693,142 @@ em {
     margin-bottom: 60px;
 }
 
-.gallery-container {
-    perspective: 1500px;
+.map-container {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    aspect-ratio: 2 / 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 400px;
-    transform-style: preserve-3d;
 }
 
-.carousel-3d {
-    position: relative;
-    width: 300px;
-    height: 400px;
-    transform-style: preserve-3d;
-    transition: transform 0.1s;
-    user-select: none;
-    touch-action: none;
-}
-
-.carousel-item {
+.world-svg {
+    width: 100%;
+    height: 100%;
     position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    -webkit-box-reflect: below 10px linear-gradient(transparent, transparent, rgba(0,0,0,0.2));
-    /* The transform will be set via JS based on index */
+    top: 0; left: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.05));
 }
 
-.carousel-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none; /* Prevent image drag breaking custom drag logic */
-    filter: brightness(0.6);
-    transition: filter 0.5s ease;
+.continent {
+    transition: fill 0.5s ease;
 }
 
-/* Make foreground image bright */
-.carousel-3d:hover .carousel-item img {
-    filter: brightness(0.4);
+.map-marker {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-/* We use a specific trick in JS to highlight the center image, but CSS hover is base */
+
+.marker-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 12px; height: 12px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.pulse-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    z-index: 1;
+    animation: pulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    opacity: 0;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* Hover State */
+.map-marker:hover .marker-dot {
+    background-color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%) scale(1.2);
+}
+.map-marker:hover .pulse-ring {
+    opacity: 1;
+}
+
+/* Active Selected State */
+.map-marker.active {
+    transform: translate(-50%, calc(-50% - 15px)) scale(1.1); /* translateY upward and scale */
+    z-index: 20;
+}
+
+.map-marker.active .marker-dot {
+    background-color: var(--accent);
+    box-shadow: 0 0 25px var(--accent);
+    transform: translate(-50%, -50%) scale(1.5);
+}
+
+.map-marker.active .pulse-ring {
+    background: rgba(255, 78, 0, 0.2);
+    animation: pulse-active 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    opacity: 1;
+}
+
+@keyframes pulse-active {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+/* Floating Info / Flag */
+.marker-info {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 15px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+}
+
+.map-marker.active .marker-info {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.country-flag {
+    width: 32px;
+    height: auto;
+    border-radius: 3px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.country-name {
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}

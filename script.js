@@ -179,120 +179,41 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 9. Rotating Image Gallery (3D Carousel)
-    const carousel = document.querySelector('.carousel-3d');
-    const items = document.querySelectorAll('.carousel-item');
+    // 9. Interactive World Map Selector
+    const mapMarkers = document.querySelectorAll('.map-marker');
     
-    if (carousel && items.length > 0) {
-        const totalItems = items.length;
-        const radius = Math.round((300 / 2) / Math.tan(Math.PI / totalItems)) + 100; // 300 is item width
-        
-        let currAngle = 0;
-        let diffAngle = 0;
-        let startX = 0;
-        let isDragging = false;
-        let rotationVelocity = 0;
-        let lastX = 0;
-        let animationFrame;
+    if (mapMarkers.length > 0) {
+        mapMarkers.forEach(marker => {
+            marker.addEventListener('click', (e) => {
+                // Prevent bubbling if there are other click listeners
+                e.stopPropagation();
 
-        // Position items in 3D circle
-        items.forEach((item, index) => {
-            const theta = (360 / totalItems) * index;
-            item.style.transform = `rotateY(${theta}deg) translateZ(${radius}px)`;
-        });
+                // Check if this marker is already active
+                const isActive = marker.classList.contains('active');
 
-        const updateCarousel = () => {
-            carousel.style.transform = `rotateY(${currAngle}deg)`;
-            
-            // Highlight front-facing image
-            const normalizedAngle = ((currAngle % 360) + 360) % 360; // Keep between 0-360
-            items.forEach((item, index) => {
-                const itemAngle = (360 - (360 / totalItems) * index) % 360;
-                const diff = Math.abs(normalizedAngle - itemAngle);
-                const isFront = diff < (360 / totalItems / 2) || diff > 360 - (360 / totalItems / 2);
-                
-                const img = item.querySelector('img');
-                if (isFront) {
-                    img.style.filter = 'brightness(1.1)';
-                    item.style.boxShadow = '0 20px 50px rgba(255, 78, 0, 0.4)';
-                } else {
-                    img.style.filter = 'brightness(0.3)';
-                    item.style.boxShadow = '0 10px 30px rgba(0,0,0,0.8)';
+                // Remove active class from ALL markers first
+                mapMarkers.forEach(m => m.classList.remove('active'));
+
+                // If it wasn't active before, make it active now
+                if (!isActive) {
+                    marker.classList.add('active');
+                    
+                    // Optional: Custom cursor reaction on click
+                    if(window.innerWidth > 768 && typeof cursor !== 'undefined' && typeof follower !== 'undefined') {
+                        follower.style.transform = `translate(-50%, -50%) scale(0.8)`;
+                        setTimeout(() => {
+                            follower.style.transform = `translate(-50%, -50%) scale(1.5)`;
+                        }, 150);
+                    }
                 }
             });
-        };
+        });
 
-        // Inertia animation loop
-        const loop = () => {
-            if (!isDragging) {
-                currAngle += rotationVelocity;
-                rotationVelocity *= 0.95; // Friction
-
-                // Auto rotate slowly if no interaction
-                if (Math.abs(rotationVelocity) < 0.01) {
-                    rotationVelocity = -0.15;
-                }
+        // Click anywhere outside a marker resets the map
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.map-marker')) {
+                mapMarkers.forEach(m => m.classList.remove('active'));
             }
-            updateCarousel();
-            animationFrame = requestAnimationFrame(loop);
-        };
-
-        // Initialize Carousel State
-        updateCarousel();
-        loop();
-
-        // Drag events
-        const startDrag = (e) => {
-            isDragging = true;
-            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-            lastX = startX;
-            cancelAnimationFrame(animationFrame);
-            
-            // specific hover cursor targetting
-            if(window.innerWidth > 768) {
-                cursor.classList.add('active');
-                follower.classList.add('active');
-                follower.style.transform = `translate(-50%, -50%) scale(0.5)`;
-            }
-        };
-
-        const onDrag = (e) => {
-            if (!isDragging) return;
-            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-            
-            const diff = clientX - startX;
-            const deltaX = clientX - lastX;
-            
-            currAngle += deltaX * 0.4; // Drag speed modifier
-            rotationVelocity = deltaX * 0.4;
-            
-            lastX = clientX;
-            updateCarousel();
-        };
-
-        const stopDrag = () => {
-            isDragging = false;
-            loop(); // re-initiate loop with velocity
-            if(window.innerWidth > 768) {
-                cursor.classList.remove('active');
-                follower.classList.remove('active');
-                follower.style.transform = `translate(-50%, -50%) scale(1)`;
-            }
-        };
-
-        carousel.addEventListener('mousedown', startDrag);
-        window.addEventListener('mousemove', onDrag);
-        window.addEventListener('mouseup', stopDrag);
-        
-        carousel.addEventListener('touchstart', startDrag);
-        window.addEventListener('touchmove', onDrag);
-        window.addEventListener('touchend', stopDrag);
-
-        // Scroll to rotate capability over the gallery section container
-        const gallerySection = document.getElementById('gallery');
-        gallerySection.addEventListener('wheel', (e) => {
-            e.preventDefault(); // Prevent page scrolling slightly when over the carousel
-            rotationVelocity += e.deltaY > 0 ? 0.5 : -0.5;
-        }, { passive: false });
+        });
     }
 });
