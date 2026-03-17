@@ -152,17 +152,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
-            // Calculate mouse position relative to the center of the card
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
 
-            // Rotation multipliers (adjust for more/less tilt)
             const rotateX = (y / rect.height) * -30;
             const rotateY = (x / rect.width) * 30;
 
             inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 
-            // Interactive gloss reflection base on mouse position
             if(overlay) {
                 const glossX = (e.clientX - rect.left) / rect.width * 100;
                 const glossY = (e.clientY - rect.top) / rect.height * 100;
@@ -171,7 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         card.addEventListener('mouseleave', () => {
-            // Reset to default flip state or base state
             inner.style.transform = `rotateX(0deg) rotateY(0deg)`;
             if(overlay) {
                 overlay.style.background = `linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 25%, transparent 30%)`;
@@ -216,4 +212,39 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // 10. Tourist Spots Hover Logic
+    const touristTooltip = document.getElementById('tourist-tooltip');
+    const ttName = document.getElementById('tt-name');
+    const ttDesc = document.getElementById('tt-desc');
+    const touristSpots = document.querySelectorAll('.tourist-spot');
+
+    if(touristTooltip && touristSpots.length > 0) {
+        touristSpots.forEach(spot => {
+            spot.addEventListener('mouseenter', (e) => {
+                const name = spot.getAttribute('data-name');
+                const desc = spot.getAttribute('data-desc');
+                
+                if (ttName) ttName.textContent = name;
+                if (ttDesc) ttDesc.textContent = desc;
+                
+                touristTooltip.classList.add('active');
+                
+                if (typeof cursor !== 'undefined' && cursor) cursor.classList.add('active');
+                if (typeof follower !== 'undefined' && follower) follower.classList.add('active');
+            });
+            
+            spot.addEventListener('mousemove', (e) => {
+                touristTooltip.style.left = e.clientX + 'px';
+                touristTooltip.style.top = e.clientY + 'px';
+            });
+            
+            spot.addEventListener('mouseleave', () => {
+                touristTooltip.classList.remove('active');
+                if (typeof cursor !== 'undefined' && cursor) cursor.classList.remove('active');
+                if (typeof follower !== 'undefined' && follower) follower.classList.remove('active');
+            });
+        });
+    }
+
 });

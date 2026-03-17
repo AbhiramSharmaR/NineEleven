@@ -832,3 +832,239 @@ em {
     letter-spacing: 1px;
     white-space: nowrap;
 }
+
+/* --------------------------------------------------------------------------
+   INTERACTIVE WORLD MAP (GLOBAL FOOTPRINT)
+----------------------------------------------------------------------------- */
+.map-section {
+    padding: 100px 0 150px;
+    position: relative;
+    background: #000;
+}
+
+.text-center {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.map-container {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    aspect-ratio: 2 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.world-svg {
+    display: none;
+}
+
+.world-map-image {
+    width: 100%;
+    height: 100%; 
+    min-height: 50vh;
+    max-height: 80vh;
+    object-fit: contain;
+    opacity: 0.8;
+    user-select: none;
+    pointer-events: auto;
+}
+
+.continent {
+    transition: fill 0.5s ease;
+}
+
+/* Map Markers */
+.map-marker {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.marker-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 12px; height: 12px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.pulse-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    z-index: 1;
+    animation: pulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    opacity: 0;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* Hover State */
+.map-marker:hover .marker-dot {
+    background-color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%) scale(1.2);
+}
+.map-marker:hover .pulse-ring {
+    opacity: 1;
+}
+
+/* Active Selected State */
+.map-marker.active {
+    transform: translate(-50%, calc(-50% - 15px)) scale(1.1);
+    z-index: 20;
+}
+
+.map-marker.active .marker-dot {
+    background-color: var(--accent);
+    box-shadow: 0 0 25px var(--accent);
+    transform: translate(-50%, -50%) scale(1.5);
+}
+
+.map-marker.active .pulse-ring {
+    background: rgba(255, 78, 0, 0.2);
+    animation: pulse-active 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    opacity: 1;
+}
+
+@keyframes pulse-active {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+/* Floating Info / Flag */
+.marker-info {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 15px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+}
+
+.map-marker.active .marker-info {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.country-flag {
+    width: 32px;
+    height: auto;
+    border-radius: 3px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.country-name {
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   TOURIST SPOTS & TOOLTIPS
+----------------------------------------------------------------------------- */
+.tourist-spot {
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tourist-spot .dot-core {
+    transition: fill 0.3s ease, filter 0.3s ease, stroke 0.4s ease;
+    stroke: rgba(255, 255, 255, 0.5);
+    stroke-width: 1px;
+}
+
+.tourist-spot:hover .dot-core {
+    fill: #ffffff;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,1));
+    stroke: #ff4e00;
+    stroke-width: 2px;
+}
+
+.tourist-tooltip {
+    position: fixed;
+    top: 0; left: 0;
+    background: rgba(8, 8, 8, 0.95);
+    border: 1px solid rgba(255, 78, 0, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 18px 22px;
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -100%) translateY(-20px) scale(0.95);
+    transition: opacity 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10000;
+    min-width: 220px;
+    max-width: 320px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 25px rgba(255, 78, 0, 0.15);
+    text-align: center;
+}
+
+.tourist-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 12px; height: 12px;
+    background: rgba(8, 8, 8, 0.95);
+    border-right: 1px solid rgba(255, 78, 0, 0.4);
+    border-bottom: 1px solid rgba(255, 78, 0, 0.4);
+}
+
+.tourist-tooltip.active {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(-15px) scale(1);
+}
+
+.tourist-tooltip h4 {
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    font-family: var(--font-heading);
+    letter-spacing: 0.5px;
+    margin-top: 0;
+}
+
+.tourist-tooltip p {
+    color: #e5e5e5;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    font-family: var(--font-body);
+    margin: 0;
+}
