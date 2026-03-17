@@ -1,6 +1,6 @@
 # Wanderlust: The Virtual Symphony 🌍✨
 
-A meticulously crafted frontend experience built entirely from scratch with **Vanilla HTML, CSS, and JavaScript**. Designed to push the boundaries of modern aesthetics and interactivity, Wanderlust serves as an immersive digital portal for curated, world-class travel discovery.
+A meticulously crafted frontend experience built entirely from scratch with **Vanilla HTML, CSS, and JavaScript**. Designed to push the boundaries of modern aesthetics and interactivity using the concept of vibe coding with the target set to be built and deployed in 90 minutes. With our theme given to be "travel and world discovery", Wanderlust serves as an immersive digital portal for curated, world-class travel discovery.
 
 ## 🚀 The Challenge
 
@@ -38,9 +38,7 @@ Everything from the high-fidelity animations, 3D CSS physics, to the fluid drag 
 
 ## 💻 How to Run
 
-1. Clone or download the repository.
-2. Open `index.html` in your favorite modern browser (Chrome, Firefox, Safari, Edge).
-3. No build steps, no `npm install`, and no local server required! It runs instantaneously.
+[nineeleven.onrender](https://nineeleven.onrender.com/)
 
 ## 📸 Glimpse of the Journey
 
